@@ -3,6 +3,7 @@
 
 #include "themes/clean_blue/theme_clean_blue.h"
 #include "themes/red_devil/theme_red_devil.h"
+#include "themes/amaranthine/theme_amaranthine.h"
 
 const char *months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
@@ -24,4 +25,5 @@ void Theme::drawHomeUI(TFT_eSPI tft, ESP32Time rtc, uint32_t batteryStatus) {}
 void initThemes() {
   themes.emplace_back(std::move(themeCleanBlue));
   themes.emplace_back(std::move(themeRedDevil));
+  themes.emplace_back(std::move(themeAmaranthine));
 }

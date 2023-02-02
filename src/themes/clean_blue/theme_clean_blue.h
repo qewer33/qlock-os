@@ -2,8 +2,6 @@
 
 #include "themes.h"
 
-#include "ESP32Time.h"
-
 class ThemeCleanBlue : public Theme {
 public:
   using Theme::Theme;

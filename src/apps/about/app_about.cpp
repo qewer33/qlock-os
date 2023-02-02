@@ -12,7 +12,7 @@ void AppAbout::drawUI(TFT_eSPI tft) {
   s.setTextColor(TFT_WHITE, TFT_BLACK, true);
   s.setTextDatum(TC_DATUM);
   s.loadFont(InterRegular24);
-  s.drawString("Qlock OS v0.1", 160, 90, 4);
+  s.drawString("qlockOS v0.1", 160, 90, 4);
   s.unloadFont();
   s.loadFont(InterRegular16);
   s.drawString("developed by qewer33", 160, 125, 2);
