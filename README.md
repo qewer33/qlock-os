@@ -19,7 +19,7 @@ The recommended battery is the Power-Xtra PX502030 3.7V 250 mAh Li-Polymer batte
 
 The complete smartwatch dimensions are 63mm x 40mm x 1.5mm. It doesn't have many hardware features such as sensors but there still is some space left inside the casing after placing the battery, so 1 or 2 sensor modules could technically be wired up and used.
 
-![image_full](https://github.com/qewer33/qlock-os/blob/main/assets/image_full.png?raw=true)
+![image_full](https://github.com/qewer33/qlock-os/blob/main/assets/image_full.jpg?raw=true)
 
 # The System
 
@@ -28,10 +28,10 @@ qlockOS utilizes the esp32-arduino framework and the TFT_eSPI library for the us
 qlockOS consists of themes and apps. Themes define the watchface (also called the home) along with the system colors. Apps are just applications, interactive little programs.
 
 The default "Clear Blue" watchface:
-![image_watchface](https://github.com/qewer33/qlock-os/blob/main/assets/image_watchface.png?raw=true)
+![image_watchface](https://github.com/qewer33/qlock-os/blob/main/assets/image_watchface.jpg?raw=true)
 
 Apps menu:
-![image_apps](https://github.com/qewer33/qlock-os/blob/main/assets/image_apps.png?raw=true)
+![image_apps](https://github.com/qewer33/qlock-os/blob/main/assets/image_apps.jpg?raw=true)
 
 ## Themes
 
