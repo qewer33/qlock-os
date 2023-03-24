@@ -25,7 +25,6 @@ enum State {
   Home,
   AppsList,
   InApp,
-  NetworkSync,
 };
 
 State cState = Home;
@@ -43,6 +42,8 @@ String wifi_ssid = "";
 String wifi_passwd = "";
 
 uint32_t sleepTimer = 0;
+
+void WiFiConnected(WiFiEvent_t event, WiFiEventInfo_t info) { configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, NTP_SERVER1); }
 
 void ARDUINO_ISR_ATTR onTimer() { xSemaphoreGiveFromISR(timerSemaphore, NULL); }
 
@@ -89,11 +90,13 @@ void setup() {
   digitalWrite(PIN_POWER_ON, HIGH);
 
   Serial.begin(9600);
-  Serial.println("Welcome to Qlock-OS!");
+  Serial.println("Welcome to qlockOS!");
 
   refreshPreferences();
+  Serial.println("Preferences loaded");
 
   tft.begin();
+  Serial.println("TFT initiliazed");
 
   tft.setRotation(3);
   tft.setSwapBytes(true);
@@ -123,8 +126,6 @@ void setup() {
     case InApp:
       apps[currentAppIndex]->buttonTopClick();
       break;
-    case NetworkSync:
-      break;
     }
   });
 
@@ -141,12 +142,21 @@ void setup() {
       apps[currentAppIndex]->exit();
       switchToAppsList();
       break;
-    case NetworkSync:
-      break;
     }
   });
 
-  btn1.attachLongPressStart(enterSleep);
+  btn1.attachLongPressStart([]() {
+    switch (cState) {
+    case Home:
+      enterSleep();
+      break;
+    case AppsList:
+      break;
+    case InApp:
+      apps[currentAppIndex]->buttonTopLongPress();
+      break;
+    }
+  });
 
   btn2.attachClick([]() {
     sleepTimer = 0;
@@ -160,8 +170,6 @@ void setup() {
     case InApp:
       apps[currentAppIndex]->buttonBottomClick();
       break;
-    case NetworkSync:
-      break;
     }
   });
 
@@ -169,7 +177,6 @@ void setup() {
     sleepTimer = 0;
     switch (cState) {
     case Home:
-      currentAppIndex = 0;
       switchToAppsList();
       break;
     case AppsList:
@@ -179,46 +186,69 @@ void setup() {
       apps[currentAppIndex]->exit();
       switchToHome();
       break;
-    case NetworkSync:
-      break;
     }
   });
 
-  btn2.attachLongPressStart([]() { cState = NetworkSync; });
+  btn2.attachLongPressStart([]() {
+    switch (cState) {
+    case Home:
+      break;
+    case AppsList:
+      break;
+    case InApp:
+      apps[currentAppIndex]->buttonBottomLongPress();
+      break;
+    }
+  });
+  Serial.println("Hardware buttons initiliazed");
+
+  configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, (const char *)nullptr);
+  Serial.println("Time configured");
 
   timerSemaphore = xSemaphoreCreateBinary();
   uiTimer = timerBegin(0, 80, true);
   timerAttachInterrupt(uiTimer, &onTimer, true);
   timerAlarmWrite(uiTimer, 1000000, true);
   timerAlarmEnable(uiTimer);
+  Serial.println("Hardware timer configured");
+
+  batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
 
   initApps();
+  Serial.println("Apps initiliazed");
   initThemes();
+  Serial.println("Themes initiliazed");
+
+  WiFi.onEvent(WiFiConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
 
   if (wifi_ssid != "") {
-    WiFi.mode(WIFI_AP_STA);
+    WiFi.mode(WIFI_STA);
     WiFi.begin(wifi_ssid.c_str(), wifi_passwd.c_str());
-    delay(250);
-    configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, NTP_SERVER1);
+    Serial.println("WiFi connection started");
   }
 
+  Serial.println("E");
   themes[currentThemeIndex]->drawHomeUI(tft, rtc, batteryStatus);
+  Serial.println("D");
   fadeScreen(2, false);
+  Serial.println("qlockOS Setup completed");
 }
 
 void loop() {
   btn1.tick();
   btn2.tick();
 
+  // 1 second timer
   if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE) {
     if (cState != InApp)
       sleepTimer++;
-    batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 4200, 0, 100), 0, 100);
-    if (cState == Home)
+    if (cState == Home) {
+      // batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
       themes[currentThemeIndex]->drawHomeUI(tft, rtc, batteryStatus);
+    }
   }
 
-  if (sleepTimer == 60)
+  if (sleepTimer == 30)
     enterSleep();
 
   switch (cState) {
@@ -229,13 +259,6 @@ void loop() {
     break;
   case InApp:
     apps[currentAppIndex]->drawUI(tft);
-    break;
-  case NetworkSync:
-    tft.fillScreen(TFT_BLACK);
-    connectToWifi();
-    delay(1000);
-    cState = Home;
-    tft.fillScreen(TFT_BLACK);
     break;
   }
 }
@@ -267,43 +290,10 @@ void switchToApp() {
   tft.drawString(apps[currentAppIndex]->name.c_str(), 150, 100, 2);
   tft.unloadFont();
   fadeScreen(1, false);
-  delay(500);
-  tft.fillScreen(TFT_BLACK);
+  delay(250);
   apps[currentAppIndex]->setup();
+  tft.fillScreen(TFT_BLACK);
+  ledcWrite(0, 0);
   apps[currentAppIndex]->drawUI(tft);
-}
-
-bool connectToWifi() {
-  tft.setTextColor(TFT_WHITE, TFT_BLACK, true);
-  tft.setTextDatum(TC_DATUM);
-  tft.drawString("Attempting to connect...", 160, 10, 2);
-
-  WiFi.disconnect();
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.beginSmartConfig();
-
-  String text;
-  int t = 0;
-
-  while (t < 400) {
-    t++;
-    delay(100);
-    if (WiFi.smartConfigDone()) {
-      tft.drawString("Successfully connected", 160, 25, 2);
-      tft.drawString(String("SSID: " + WiFi.SSID()).c_str(), 160, 40, 2);
-      tft.drawString(String("PSWD: " + WiFi.psk()).c_str(), 160, 55, 2);
-      preferences.begin(PREFS_KEY);
-      preferences.putString("wifi_ssid", WiFi.SSID());
-      preferences.putString("wifi_passwd", WiFi.psk());
-      preferences.end();
-      break;
-    }
-  }
-
-  if (t >= 400) {
-    WiFi.disconnect();
-    tft.drawString("Connection attempt timed out", 160, 25, 2);
-    return false;
-  }
-  return true;
+  fadeScreen(1, false);
 }

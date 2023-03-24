@@ -23,6 +23,7 @@ public:
   uint32_t highscore;
   uint32_t carLane;
   uint32_t gameSpeed;
+  bool carSpawnSkip;
   Preferences preferences;
   std::vector<RacerTreeObject> trees;
   std::vector<RacerCarObject> cars;

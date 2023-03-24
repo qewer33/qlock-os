@@ -16,7 +16,9 @@ public:
   virtual void drawUI(TFT_eSPI tft);
   virtual void exit();
   virtual void buttonTopClick();
+  virtual void buttonTopLongPress();
   virtual void buttonBottomClick();
+  virtual void buttonBottomLongPress();
 };
 
 extern std::vector<std::unique_ptr<App>> apps;
