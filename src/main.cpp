@@ -7,6 +7,7 @@
 #include "esp_wifi.h"
 
 #include "apps.h"
+#include "lib/log.h"
 #include "pin_config.h"
 #include "resources.h"
 #include "resources/fonts/InterRegular16.h"
@@ -90,13 +91,13 @@ void setup() {
   digitalWrite(PIN_POWER_ON, HIGH);
 
   Serial.begin(9600);
-  Serial.println("Welcome to qlockOS!");
+  log(LOG_INFO, "Welcome to qlockOS!");
 
   refreshPreferences();
-  Serial.println("Preferences loaded");
+  log(LOG_SUCCESS, "Preferences loaded");
 
   tft.begin();
-  Serial.println("TFT initiliazed");
+  log(LOG_SUCCESS, "TFT initiliazed");
 
   tft.setRotation(3);
   tft.setSwapBytes(true);
@@ -200,38 +201,39 @@ void setup() {
       break;
     }
   });
-  Serial.println("Hardware buttons initiliazed");
+  log(LOG_SUCCESS, "Hardware buttons initiliazed");
 
   configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, (const char *)nullptr);
-  Serial.println("Time configured");
+  log(LOG_SUCCESS, "RTC time configured");
 
   timerSemaphore = xSemaphoreCreateBinary();
   uiTimer = timerBegin(0, 80, true);
   timerAttachInterrupt(uiTimer, &onTimer, true);
   timerAlarmWrite(uiTimer, 1000000, true);
   timerAlarmEnable(uiTimer);
-  Serial.println("Hardware timer configured");
+  log(LOG_SUCCESS, "Hardware timer configured");
 
   batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
 
   initApps();
-  Serial.println("Apps initiliazed");
+  log(LOG_SUCCESS, "Apps initiliazed");
   initThemes();
-  Serial.println("Themes initiliazed");
+  log(LOG_SUCCESS, "Themes initiliazed");
 
   WiFi.onEvent(WiFiConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
 
   if (wifi_ssid != "") {
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifi_ssid.c_str(), wifi_passwd.c_str());
-    Serial.println("WiFi connection started");
+    log(LOG_SUCCESS, "WiFi connection started");
   }
 
-  Serial.println("E");
   themes[currentThemeIndex]->drawHomeUI(tft, rtc, batteryStatus);
-  Serial.println("D");
+  log(LOG_SUCCESS, "Home UI drawn");
   fadeScreen(2, false);
-  Serial.println("qlockOS Setup completed");
+  log(LOG_SUCCESS, "Screen fade-in completed");
+
+  log(LOG_SUCCESS, "qlockOS setup completed");
 }
 
 void loop() {
@@ -243,7 +245,7 @@ void loop() {
     if (cState != InApp)
       sleepTimer++;
     if (cState == Home) {
-      // batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
+      batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
       themes[currentThemeIndex]->drawHomeUI(tft, rtc, batteryStatus);
     }
   }
