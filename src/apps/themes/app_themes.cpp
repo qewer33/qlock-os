@@ -1,5 +1,5 @@
 #include "app_themes.h"
-#include "pin_config.h"
+#include "os_config.h"
 #include "resources/fonts/InterRegular24.h"
 #include "resources/icons.h"
 #include "themes.h"

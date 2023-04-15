@@ -26,4 +26,4 @@ extern std::vector<std::unique_ptr<App>> apps;
 extern uint32_t currentAppIndex;
 
 void initApps();
-void drawAppsListUI(TFT_eSPI tft);
+void drawAppsListUI(TFT_eSPI tft, uint32_t batteryStatus);

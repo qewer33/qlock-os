@@ -1,8 +1,9 @@
 #pragma once
 
+#define DEVICE_NAME          "qewer33's Watch"
 #define PREFS_KEY            "qlock-os"
 
-// Pins
+// Device Pins
 #define PIN_LCD_BL           38
 
 #define PIN_LCD_D0           39
@@ -32,7 +33,7 @@
 #define PIN_TOUCH_INT        16
 #define PIN_TOUCH_RES        21
 
-// Time
+// Time Configuration
 #define NTP_SERVER1          "pool.ntp.org"
 #define NTP_SERVER2          "time.nist.gov"
 #define GMT_OFFSET_SEC       (3600 * 3)

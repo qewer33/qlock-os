@@ -1,5 +1,5 @@
 #include "app_about.h"
-#include "resources.h"
+#include "resources/icons.h"
 #include "resources/fonts/InterRegular16.h"
 #include "resources/fonts/InterRegular24.h"
 

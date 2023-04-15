@@ -58,12 +58,12 @@ void ThemeAmaranthine::drawHomeUI(TFT_eSPI tft, ESP32Time rtc, uint32_t batteryS
   s.setTextDatum(MC_DATUM);
   String hoursFiller = rtc.getHour(true) < 10 ? "0" : "";
   String minutesFiller = rtc.getMinute() < 10 ? "0" : "";
-  String timeStr = hoursFiller + String(rtc.getHour(true)) + ":" + minutesFiller + String(rtc.getMinute());
+  String timeStr = hoursFiller + String(rtc.getHour(true)) + "." + minutesFiller + String(rtc.getMinute());
   s.drawString(timeStr.c_str(), 160, 95);
   s.unloadFont();
 
   s.loadFont(InterRegular16);
-  s.drawString(rtc.getDay() + " " + String(months[rtc.getMonth()]) + " " + rtc.getYear(), 160, 145);
+  s.drawString(String(rtc.getDay()) + " " + String(months[rtc.getMonth()]) + " " + rtc.getYear(), 160, 145);
   s.unloadFont();
 
   s.loadFont(SmoochRegular48);

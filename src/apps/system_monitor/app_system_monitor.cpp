@@ -1,5 +1,5 @@
 #include "app_system_monitor.h"
-#include "pin_config.h"
+#include "os_config.h"
 #include "resources/fonts/InterRegular16.h"
 #include "resources/icons.h"
 

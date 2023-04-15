@@ -1,7 +1,7 @@
 #pragma once
 
 #include "apps.h"
-#include "resources.h"
+#include "resources/icons.h"
 
 #include "Preferences.h"
 #include "TFT_eSPI.h"

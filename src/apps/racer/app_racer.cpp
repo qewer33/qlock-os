@@ -1,7 +1,7 @@
 #include "app_racer.h"
 #include "app_racer_res.h"
-#include "pin_config.h"
-#include "resources.h"
+#include "os_config.h"
+#include "resources/icons.h"
 
 const unsigned char *tree_images[] = {tree1.pixel_data, tree2.pixel_data, tree3.pixel_data, tree4.pixel_data, tree5.pixel_data, tree6.pixel_data};
 

@@ -1,5 +1,5 @@
 #include "app_flashlight.h"
-#include "pin_config.h"
+#include "os_config.h"
 #include "resources/fonts/InterRegular24.h"
 
 #include "Arduino.h"

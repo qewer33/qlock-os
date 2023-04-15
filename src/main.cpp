@@ -8,9 +8,9 @@
 
 #include "apps.h"
 #include "lib/log.h"
-#include "pin_config.h"
-#include "resources.h"
+#include "os_config.h"
 #include "resources/fonts/InterRegular16.h"
+#include "resources/icons.h"
 #include "themes.h"
 
 #define USE_DMA_TO_TFT
@@ -242,7 +242,7 @@ void loop() {
 
   // 1 second timer
   if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE) {
-    if (cState != InApp)
+    if (cState != InApp && batteryStatus != 100)
       sleepTimer++;
     if (cState == Home) {
       batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
@@ -250,14 +250,14 @@ void loop() {
     }
   }
 
-  if (sleepTimer == 30)
+  if (sleepTimer == 30 && batteryStatus != 100)
     enterSleep();
 
   switch (cState) {
   case Home:
     break;
   case AppsList:
-    drawAppsListUI(tft);
+    drawAppsListUI(tft, batteryStatus);
     break;
   case InApp:
     apps[currentAppIndex]->drawUI(tft);
@@ -277,7 +277,7 @@ void switchToAppsList() {
   refreshPreferences();
   fadeScreen(1, true);
   cState = AppsList;
-  drawAppsListUI(tft);
+  drawAppsListUI(tft, batteryStatus);
   fadeScreen(1, false);
 }
 

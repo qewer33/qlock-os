@@ -1,6 +1,6 @@
 #include "app_smartconfig.h"
-#include "pin_config.h"
-#include "resources.h"
+#include "os_config.h"
+#include "resources/icons.h"
 #include "resources/fonts/InterRegular16.h"
 #include "resources/fonts/InterRegular24.h"
 

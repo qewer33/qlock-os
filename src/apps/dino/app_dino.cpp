@@ -1,6 +1,6 @@
 #include "app_dino.h"
 #include "app_dino_res.h"
-#include "resources.h"
+#include "resources/icons.h"
 
 void AppDino::setup() {
   gameOver = false;

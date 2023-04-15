@@ -1,5 +1,5 @@
 #include "app_stopwatch.h"
-#include "resources.h"
+#include "resources/icons.h"
 #include "resources/fonts/InterRegular24.h"
 
 void AppStopwatch::setup() {
