@@ -6,7 +6,10 @@
 
 #include "WiFi.h"
 
-void AppSmartconfig::setup() { done = false; }
+void AppSmartconfig::setup() { 
+  done = false;
+  skipFirstRefresh = true;
+}
 
 void AppSmartconfig::drawUI(TFT_eSPI tft) {
   if (!done) {

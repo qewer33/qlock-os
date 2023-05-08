@@ -10,6 +10,7 @@ public:
   const unsigned char *icon;
   unsigned int iconWidth;
   unsigned int iconHeight;
+  bool skipFirstRefresh;
 
   App(String name, const unsigned char *icon, unsigned int iconWidth, unsigned int iconHeight);
   virtual void setup();

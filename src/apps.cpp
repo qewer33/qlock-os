@@ -30,6 +30,7 @@ App::App(String name, const unsigned char *icon, unsigned int iconWidth, unsigne
   this->icon = icon;
   this->iconWidth = iconWidth;
   this->iconHeight = iconHeight;
+  this->skipFirstRefresh = false;
 }
 
 void App::setup() {}
@@ -86,33 +87,42 @@ void drawAppsListUI(TFT_eSPI tft, uint32_t batteryStatus) {
   s.drawString(DEVICE_NAME, 5, 10);
   s.unloadFont();
 
-  s.pushImage(220, 5, 25, 25, (uint16_t *)icon_no_ble_small.pixel_data);
+  s.pushImage(194, 5, 25, 25, (uint16_t *)icon_no_ble_small.pixel_data);
 
   if (WiFi.status() == WL_CONNECTED)
-    s.pushImage(252, 5, 25, 25, (uint16_t *)icon_wifi_small.pixel_data);
+    s.pushImage(221, 5, 25, 25, (uint16_t *)icon_wifi_small.pixel_data);
   else
-    s.pushImage(252, 5, 25, 25, (uint16_t *)icon_no_wifi_small.pixel_data);
+    s.pushImage(221, 5, 25, 25, (uint16_t *)icon_no_wifi_small.pixel_data);
 
-  switch (batteryStatus / 20) {
-  case 0:
-    s.pushImage(290, 5, 25, 25, (uint16_t *)icon_battery_0_small.pixel_data);
-    break;
-  case 1:
-    s.pushImage(290, 5, 25, 25, (uint16_t *)icon_battery_20_small.pixel_data);
-    break;
-  case 2:
-    s.pushImage(290, 5, 25, 25, (uint16_t *)icon_battery_40_small.pixel_data);
-    break;
-  case 3:
-    s.pushImage(290, 5, 25, 25, (uint16_t *)icon_battery_60_small.pixel_data);
-    break;
-  case 4:
-    s.pushImage(290, 5, 25, 25, (uint16_t *)icon_battery_80_small.pixel_data);
-    break;
-  case 5:
-    s.pushImage(290, 5, 25, 25, (uint16_t *)icon_battery_100_small.pixel_data);
-    break;
+  auto batteryStatusIcon = (uint16_t *)icon_battery_charge_small.pixel_data;
+  if(batteryStatus != 100) {
+    switch (batteryStatus / 20) {
+    case 0:
+      batteryStatusIcon = (uint16_t *)icon_battery_0_small.pixel_data;
+      break;
+    case 1:
+      batteryStatusIcon = (uint16_t *)icon_battery_20_small.pixel_data;
+      break;
+    case 2:
+      batteryStatusIcon = (uint16_t *)icon_battery_40_small.pixel_data;
+      break;
+    case 3:
+      batteryStatusIcon = (uint16_t *)icon_battery_60_small.pixel_data;
+      break;
+    case 4:
+      batteryStatusIcon = (uint16_t *)icon_battery_80_small.pixel_data;
+      break;
+    case 5:
+      batteryStatusIcon = (uint16_t *)icon_battery_100_small.pixel_data;
+      break;
+    }
   }
+  s.pushImage(255, 5, 25, 25, batteryStatusIcon);
+  s.loadFont(InterRegular16);
+  s.setTextDatum(TL_DATUM);
+  s.setTextColor(s.color565(69, 193, 72));
+  s.drawString(String(batteryStatus), 285, 11);
+  s.unloadFont();
 
   s.pushSprite(0, 0);
   s.deleteSprite();

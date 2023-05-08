@@ -1,7 +1,7 @@
 #include "log.h"
 #include "Arduino.h"
 
-void log(LogLevel level, char *message) {
+void log(LogLevel level, const char *message) {
   if (Serial) {
     String prefix = "";
     switch (level) {

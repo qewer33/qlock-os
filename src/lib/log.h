@@ -1,3 +1,3 @@
 enum LogLevel { LOG_INFO, LOG_SUCCESS, LOG_WARNING, LOG_ERROR };
 
-void log(LogLevel level, char *message);
+void log(LogLevel level, const char *message);

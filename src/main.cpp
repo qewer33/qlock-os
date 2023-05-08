@@ -8,6 +8,7 @@
 
 #include "apps.h"
 #include "lib/log.h"
+#include "lib/compile_time.h"
 #include "os_config.h"
 #include "resources/fonts/InterRegular16.h"
 #include "resources/icons.h"
@@ -203,7 +204,8 @@ void setup() {
   });
   log(LOG_SUCCESS, "Hardware buttons initiliazed");
 
-  configTime(GMT_OFFSET_SEC, DAY_LIGHT_OFFSET_SEC, (const char *)nullptr);
+  // hacky workaround for setting rtc to compile time
+  if (rtc.getYear() == 1970) rtc.setTime((long) UNIX_TIMESTAMP);
   log(LOG_SUCCESS, "RTC time configured");
 
   timerSemaphore = xSemaphoreCreateBinary();
@@ -234,6 +236,8 @@ void setup() {
   log(LOG_SUCCESS, "Screen fade-in completed");
 
   log(LOG_SUCCESS, "qlockOS setup completed");
+
+  log(LOG_SUCCESS, String("This version of qlockOS was compiled at: " + String(__TIME__) + " " + String(__DATE__)).c_str());
 }
 
 void loop() {
@@ -244,10 +248,9 @@ void loop() {
   if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE) {
     if (cState != InApp && batteryStatus != 100)
       sleepTimer++;
-    if (cState == Home) {
-      batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
+    if (cState == Home) 
       themes[currentThemeIndex]->drawHomeUI(tft, rtc, batteryStatus);
-    }
+    batteryStatus = constrain(map((analogRead(PIN_BAT_VOLT) * 2 * 3.3 * 1000) / 4096, 3200, 3900, 0, 100), 0, 100);
   }
 
   if (sleepTimer == 30 && batteryStatus != 100)
@@ -296,6 +299,6 @@ void switchToApp() {
   apps[currentAppIndex]->setup();
   tft.fillScreen(TFT_BLACK);
   ledcWrite(0, 0);
-  apps[currentAppIndex]->drawUI(tft);
+  if (!apps[currentAppIndex]->skipFirstRefresh) apps[currentAppIndex]->drawUI(tft);
   fadeScreen(1, false);
 }
